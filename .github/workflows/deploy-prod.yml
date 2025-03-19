@@ -1,0 +1,66 @@
+# File: .github/workflows/deploy-prod.yml
+name: Build and Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      confirm_deployment:
+        description: 'Type "deploy-to-production" to confirm'
+        required: true
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: |
+            ghananauticalinfo/ditest:latest
+            ghananauticalinfo/ditest:prod-${{ github.sha }}
+          build-args: |
+            ENVIRONMENT=production
+          
+  deploy-prod:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    # Only run if triggered via workflow_dispatch with correct confirmation
+    if: |
+      github.event_name == 'workflow_dispatch' && 
+      github.event.inputs.confirm_deployment == 'deploy-to-production' || 
+      github.event_name == 'push'
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          
+      - name: Save DigitalOcean kubeconfig
+        run: doctl kubernetes cluster kubeconfig save ${{ secrets.PROD_CLUSTER_NAME }}
+      
+      - name: Deploy to Kubernetes
+        run: |
+          # Replace image tag in deployment file
+          sed -i "s|yourdockerhubusername/ditest:latest|ghananauticalinfo/ditest:prod-${{ github.sha }}|g" k8s/prod/deployment.yaml
+          
+          # Apply Kubernetes manifests
+          kubectl apply -f k8s/prod/deployment.yaml
+          kubectl rollout status deployment/ditest-prod -n prod

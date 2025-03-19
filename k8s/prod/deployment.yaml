@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ditest-prod
+  namespace: prod
+  labels:
+    app: ditest
+    env: prod
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ditest
+      env: prod
+  template:
+    metadata:
+      labels:
+        app: ditest
+        env: prod
+    spec:
+      containers:
+      - name: ditest
+        image: ghananauticalinfo/ditest:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 400m
+            memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ditest-prod-service
+  namespace: prod
+spec:
+  selector:
+    app: ditest
+    env: prod
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ditest-prod-ingress
+  namespace: ditest-prod
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # Production-specific annotations
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+  - hosts:
+    - snapper.ghananautical.info
+    secretName: snapper-tls
+  rules:
+  - host: snapper.ghananautical.info
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ditest-prod-service
+            port:
+              number: 80
