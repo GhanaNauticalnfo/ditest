@@ -64,7 +64,7 @@ For more information on using the Angular CLI, including detailed command refere
 ## Main Branches
 
 main - Production-ready code that deploys to the production environment at snapper.ghananautical.info
-develop - Integration branch for ongoing development, deploys to the test environment at snapper-test.ghananautical.info
+develop - Integration branch for  ongoing development, deploys to the test environment at snapper-test.ghananautical.info
 
 Feature Branches
 
