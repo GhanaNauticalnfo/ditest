@@ -1,13 +1,14 @@
+# File: k8s/prod/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ditest-prod
+  name: ditest
   namespace: prod
   labels:
     app: ditest
     env: prod
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: ditest
@@ -35,7 +36,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ditest-prod-service
+  name: ditest-service
   namespace: prod
 spec:
   selector:
@@ -68,6 +69,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: ditest-prod-service
+            name: ditest-service
             port:
               number: 80

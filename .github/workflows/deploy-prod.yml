@@ -54,7 +54,22 @@ jobs:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           
       - name: Save DigitalOcean kubeconfig
-        run: doctl kubernetes cluster kubeconfig save ${{ secrets.PROD_CLUSTER_NAME }}
+        run: |
+          echo "Available Kubernetes clusters:"
+          doctl kubernetes cluster list
+          
+          # Get the cluster ID instead of relying on exact name match
+          CLUSTER_ID=$(doctl kubernetes cluster list --format ID,Name --no-header | grep ${{ secrets.PROD_CLUSTER_NAME }} | awk '{print $1}')
+          
+          if [ -z "$CLUSTER_ID" ]
+          then
+            echo "Could not find cluster with name containing ${{ secrets.PROD_CLUSTER_NAME }}"
+            echo "Please check the PROD_CLUSTER_NAME secret and available clusters listed above"
+            exit 1
+          else
+            echo "Found cluster ID: $CLUSTER_ID"
+            doctl kubernetes cluster kubeconfig save $CLUSTER_ID
+          fi
       
       - name: Deploy to Kubernetes
         run: |
@@ -63,4 +78,4 @@ jobs:
           
           # Apply Kubernetes manifests
           kubectl apply -f k8s/prod/deployment.yaml
-          kubectl rollout status deployment/ditest-prod -n prod
+          kubectl rollout status deployment/ditest -n prod

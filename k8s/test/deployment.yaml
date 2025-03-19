@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ditest-test
+  name: ditest
   namespace: test
   labels:
     app: ditest
@@ -36,7 +36,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ditest-test-service
+  name: ditest-service
   namespace: test
 spec:
   selector:
@@ -63,6 +63,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: ditest-test-service
+            name: ditest-service
             port:
               number: 80
