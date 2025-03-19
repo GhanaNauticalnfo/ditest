@@ -57,3 +57,42 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+
+
+
+## Main Branches
+
+main - Production-ready code that deploys to the production environment at snapper.ghananautical.info
+develop - Integration branch for ongoing development, deploys to the test environment at snapper-test.ghananautical.info
+
+Feature Branches
+
+feature/* - For new features (e.g., feature/login-page, feature/map-integration)
+bugfix/* - For bug fixes (e.g., bugfix/navbar-alignment, bugfix/api-timeout)
+
+Workflow
+
+Development Work
+
+Create a new feature or bugfix branch from develop
+Work on your changes locally
+Push to your feature/bugfix branch
+Automatic deployment to test environment occurs
+
+
+Integration
+
+When feature is complete, create a Pull Request to merge into develop
+Review, test, and approve the PR
+Merge into develop
+Automatic deployment to test environment occurs
+
+
+Release
+
+When develop is stable and ready for production
+Create a Pull Request to merge develop into main
+Final review and testing
+Merge into main
+Automatic deployment to production environment occurs
