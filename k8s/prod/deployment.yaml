@@ -51,7 +51,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ditest-prod-ingress
-  namespace: ditest-prod
+  namespace: prod
   annotations:
     kubernetes.io/ingress.class: nginx
     # Production-specific annotations
