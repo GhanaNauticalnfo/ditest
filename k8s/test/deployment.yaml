@@ -45,10 +45,14 @@ metadata:
   name: ditest-ingress
   namespace: test
   annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
     kubernetes.io/tls-acme: "true"
 spec:
   ingressClassName: nginx
+  tls:
+  - hosts:
+    - snapper-test.ghananautical.info
+    secretName: snapper-test-tls
   rules:
   - host: snapper-test.ghananautical.info
     http:
