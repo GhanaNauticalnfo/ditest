@@ -44,6 +44,9 @@ kind: Ingress
 metadata:
   name: ditest-ingress
   namespace: test
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+    kubernetes.io/tls-acme: "true"
 spec:
   ingressClassName: nginx
   rules:
