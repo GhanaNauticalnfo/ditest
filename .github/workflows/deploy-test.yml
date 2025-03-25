@@ -29,7 +29,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghananauticalinfo/ditest:test-${{ env.BRANCH_NAME }}
+          tags: |
+            ghananauticalinfo/ditest:test-${{ env.BRANCH_NAME }}
+            ghananauticalinfo/ditest:test-${{ env.BRANCH_NAME }}-${{ github.sha }}
           build-args: |
             ENVIRONMENT=test
           
@@ -69,8 +71,9 @@ jobs:
       - name: Deploy to Kubernetes
         run: |
           # Replace image tag in deployment file
-          sed -i "s|yourdockerhubusername/ditest:latest|ghananauticalinfo/ditest:test-${{ env.BRANCH_NAME }}|g" k8s/test/deployment.yaml
-          
+          #sed -i "s|yourdockerhubusername/ditest:latest|ghananauticalinfo/ditest:test-${{ env.BRANCH_NAME }}|g" k8s/test/deployment.yaml
+          sed -i "s|ghananauticalinfo/ditest:latest|ghananauticalinfo/ditest:test-${{ env.BRANCH_NAME }}-${{ github.sha }}|g" k8s/test/deployment.yaml
+
           # Apply Kubernetes manifests
           kubectl apply -f k8s/test/deployment.yaml
           kubectl rollout status deployment/ditest -n test
