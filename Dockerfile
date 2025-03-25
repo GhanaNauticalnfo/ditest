@@ -6,8 +6,13 @@ RUN npm ci
 COPY . .
 
 # Build with specified environment
+# Build with the specified environment or default to production
 ARG ENVIRONMENT=production
-RUN npm run build -- --configuration=${ENVIRONMENT}
+RUN if [ "$ENVIRONMENT" = "test" ]; then \
+      npm run build; \
+    else \
+      npm run build -- --configuration=${ENVIRONMENT}; \
+    fi
 
 # Stage 2: Serve the app with Nginx
 FROM nginx:alpine
