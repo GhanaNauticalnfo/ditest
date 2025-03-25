@@ -73,9 +73,11 @@ jobs:
       
       - name: Deploy to Kubernetes
         run: |
-          # Replace image tag in deployment file
-          sed -i "s|yourdockerhubusername/ditest:latest|ghananauticalinfo/ditest:prod-${{ github.sha }}|g" k8s/prod/deployment.yaml
-          
           # Apply Kubernetes manifests
           kubectl apply -f k8s/prod/deployment.yaml
+          
+          # Directly update the container image - more reliable than sed
+          kubectl set image deployment/ditest ditest=ghananauticalinfo/ditest:prod-${{ github.sha }} -n prod
+          
+          # Wait for rollout to complete
           kubectl rollout status deployment/ditest -n prod
